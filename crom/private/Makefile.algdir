@@ -1,0 +1,4 @@
+include ../../Makefile.inc
+# These determine where WDL is pushed to in FireCloud, defaulting to the user's own namespace and the directory name for the task name.
+FIRECLOUD_WDL_DOMAIN=${USER}
+FIRECLOUD_WDL_METHOD_NAME=${FOLDER}

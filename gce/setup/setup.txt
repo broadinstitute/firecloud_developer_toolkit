@@ -1,0 +1,34 @@
+sudo apt-get install -y unzip git tree
+
+#root not needed
+cd /opt
+git clone https://github.com/broadinstitute/firecloud_developers_workbench.git /opt/fdt
+
+cd /opt/fdt
+. fdtsetroot -s
+
+#root needed
+sudo apt-get update
+install_python_2.7.sh
+install_oraclejavajdk_8_debian7bp.sh
+install_docker_latest_debian7bp.sh #needs relogin for group membership to take effect
+set_timezone_ET.sh
+
+
+#root not needed
+install_gsutil_latest.sh #note - corrupts the ~/.bashrc if run more than once, needs manual editing to fix #needs python2.7
+
+#firecloud-specific, root not needed
+install_cromwell_21.sh #needs java
+install_firecloudcli_latest.sh #relies on python venv, java
+install_fissfc_latest.sh #relies on python pip
+
+
+----
+gcloud init
+docker login
+
+. createnewrepo /opt/myrepo
+. createnewtask mytask
+build
+runcromwell

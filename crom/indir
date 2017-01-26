@@ -1,0 +1,49 @@
+#!/usr/bin/env python
+
+'''
+cl = cromwell latest
+cd `cl` from somehwhere under the task to get to the most recent execution output directory
+Note that this needs to be set to have executable permissions to work.
+
+'''
+
+import os
+import sys
+import glob
+
+base_dir = os.getenv('FDT_CURRENT_ALG_ROOT')
+if base_dir is None:
+    raise Exception('FDT_CURRENT_ALG_ROOT not set, you need to run setalgdir first')
+
+
+dir1 = os.path.join(base_dir,'cromwell-executions')
+ce_list = glob.glob(os.path.join(dir1,'*workflow'))
+if len(ce_list) == 1:
+    dir2 = ce_list[0]
+elif len(ce_list) == 0:
+    raise Exception('could not find *workflow in cromwell-executions')
+else:
+    raise Exception('multiple workflows')
+
+
+# choose the latest execution
+file_list2 = os.listdir(dir2)
+
+max_time = 0
+latest_filepath = None
+for fn in file_list2:
+    filepath = os.path.join(dir2,fn)
+    statinfo = os.stat(filepath)
+    mtime = statinfo.st_mtime
+    if mtime > max_time:
+        max_time = mtime
+        latest_filepath = filepath
+dir3 = latest_filepath
+
+file_list3 = os.listdir(dir3)
+if len(file_list3) != 1:
+    #multiple modules, just stop at this level
+    dir4 = dir3
+else:
+    dir4 = os.path.join(dir3,file_list3[0],'inputs')
+print (dir4)

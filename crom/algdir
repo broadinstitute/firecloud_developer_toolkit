@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+echo $FDT_CURRENT_ALG_ROOT

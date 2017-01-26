@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+if [ -z "$FDT_CURRENT_ALG_ROOT" ] ; then
+    echo "FDT_CURRENT_ALG_ROOT must be set, please source setalgdir"
+else
+    cd $FDT_CURRENT_ALG_ROOT
+    make buildclean
+    cd - #return to previous cwd
+fi

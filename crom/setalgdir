@@ -1,0 +1,30 @@
+#!/bin/bash
+
+#
+# Source (don't run) this script to update the path in the current shell
+
+if [ "$0" != "bash" -a "$0" != "-bash" ]; then
+    echo "usage: . setalgdir [<algdir>]"
+else
+
+    if [ -z "$1" ]; then
+        algroot="$(pwd)"
+    else
+        algroot="$1"
+    fi
+
+    parentsubdir=$(basename $(dirname $algroot))
+
+    if [ $parentsubdir == "tasks" -o $parentsubdir == "workflows" ]; then
+        export FDT_CURRENT_ALG_ROOT="$algroot"
+        export FDT_REPO_ROOT=$(dirname $(dirname $algroot))
+        echo "current algdir now $FDT_CURRENT_ALG_ROOT"
+        echo "current repo now $FDT_REPO_ROOT"
+    else
+        echo "Alg must be in a tasks or workflows directory, as set up by createnewrepo"
+    fi
+
+    unset algroot
+    unset parentsubdir
+
+fi

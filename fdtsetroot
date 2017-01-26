@@ -1,0 +1,29 @@
+#!/bin/bash
+#
+# Source (don't run) this script to update the path in the current shell
+# -s: also add these path changes to your .bashrc
+# this must be run from within the same directory as the script
+
+if [ "$0" != "bash" -a "$0" != "-bash" ]; then
+    echo "usage: . fdtsetroot [-s] "
+else
+
+    export FDT_ROOT=$(pwd)
+    export FDT_BIN_ROOT=$FDT_ROOT/localbin #localbin lives in .gitignore
+    export PATH=$FDT_ROOT/crom:$FDT_ROOT/gce:$FDT_ROOT/install:$PATH
+    echo "adding to path"
+
+    #create a place for non-root installations
+    mkdir -p $FDT_BIN_ROOT
+
+    if  [ "$1" == "-s" ] ; then
+            echo "Adding to ~/.bashrc"
+            #note double quote
+            echo "export FDT_ROOT=$FDT_ROOT" >> ~/.bashrc
+            echo "export FDT_BIN_ROOT=$FDT_ROOT/localbin" >> ~/.bashrc
+
+            #note single quote
+            echo 'export PATH=$FDT_ROOT/crom:$FDT_ROOT/gce:$FDT_ROOT/install:$PATH' >> ~/.bashrc
+    fi
+    unset fdt_root
+fi

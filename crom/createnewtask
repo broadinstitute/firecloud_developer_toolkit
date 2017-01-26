@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+if [ "$0" != "bash" -a "$0" != "-bash" ]; then
+    echo "usage: . createnewtask <newtaskname>"
+else
+
+    if [ -z "$1" ]; then
+        echo "you must specify <newtaskname>"
+    else
+        taskname=$1
+
+        if [ -z "$FDT_ROOT" ] ; then
+            echo "FDT_ROOT must be set, please source fdtsetroot"
+        else
+            if [ -z "$FDT_REPO_ROOT" ] ; then
+                echo "FDT_REPO_ROOT must be set, please source createnewrepo or setrepo"
+            else
+                cd $FDT_REPO_ROOT/tasks
+                make template TASK=$taskname
+                if [ -d  $taskname ]; then
+                    cd $taskname
+                    . setalgdir $FDT_REPO_ROOT/tasks/$taskname
+                else
+                    echo "Could not create new directory $FDT_REPO_ROOT/tasks/$taskname"
+                fi
+
+            fi
+        unset taskname
+
+        fi
+
+    fi
+
+fi

@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+if [ -z "$FDT_CURRENT_ALG_ROOT" ] ; then
+    echo "FDT_CURRENT_ALG_ROOT must be set, please source setalgdir"
+else
+
+#TBD accept commandlines for both taskdef and inputtest
+
+    inputtest="$1"
+
+    cd $FDT_CURRENT_ALG_ROOT
+
+    if [ -z "$inputtest" ];then
+        make runcromwell
+    else
+        make runcromwell INPUTTEST=$inputtest
+    fi
+
+    unset taskdef
+    cd - #return to previous cwd
+fi

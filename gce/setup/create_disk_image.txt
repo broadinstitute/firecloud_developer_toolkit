@@ -1,0 +1,59 @@
+Creating your private image:
+setup/create_initial_vm.sh
+gcloud compute ssh instance1
+#paste or transfer vm_format_disk.sh and config_gce_deb7bp_vm.sh to the new node, set their executable bits.
+vm_format_disk.sh (on remote)
+config_gce_deb7bp_vm.sh
+rm vm_format_disk.sh config_gce_deb7bp_vm.sh
+sudo shutdown -h now
+(local)
+gcloud compute instances set-disk-auto-delete instance1 --no-auto-delete --disk instance1
+gcloud compute instances set-disk-auto-delete instance1 --no-auto-delete --disk instance1-disk
+
+gcloud compute instances delete instance1
+
+gcloud compute images create firecloud-deb7bp-2016-09-07 --source-disk instance1
+gcloud compute images create firecloud-deb7bp-2016-09-07-aux --source-disk instance1-disk
+
+gcloud compute disks delete instance1 instance1-disk
+
+
+#update the create_and_start_vm script to point to this new image
+-----
+#creating a tarball of the image, for import into other projects
+gcloud compute disks snapshot test1 --snapshot-names image-snapshot-base2
+gcloud compute disks snapshot test1-aux --snapshot-names image-snapshot-aux2
+
+gcloud compute disks create image-disk-base --source-snapshot image-snapshot-base2
+gcloud compute disks create image-disk-aux --source-snapshot image-snapshot-aux2
+gcloud compute disks create temporary-disk --size 100
+
+gcloud compute instances create imager-vm  --zone us-central1-f --machine-type n1-standard-2 --scopes storage-rw \
+    --disk name=image-disk-base,device-name=image-disk-base \
+    --disk name=image-disk-aux,device-name=image-disk-aux \
+    --disk name=temporary-disk,device-name=temporary-disk
+
+sudo mkdir /mnt/tmp
+sudo mkfs.ext4 -F /dev/disk/by-id/google-temporary-disk
+sudo mount -o discard,defaults /dev/disk/by-id/google-temporary-disk /mnt/tmp
+sudo mkdir /mnt/tmp/base
+sudo mkdir /mnt/tmp/aux
+
+sudo dd if=/dev/disk/by-id/google-image-disk-base of=/mnt/tmp/base/disk.raw bs=4096
+sudo dd if=/dev/disk/by-id/google-image-disk-aux of=/mnt/tmp/aux/disk.raw bs=4096
+
+cd /mnt/tmp/base
+sudo tar czvf  /mnt/tmp/firecloud_deb7bp_2016-09-07_base.tar.gz disk.raw
+cd /mnt/tmp/aux
+sudo tar czvf /mnt/tmp/firecloud_deb7bp_2016-09-07_aux.tar.gz disk.raw
+
+gcloud compute copy-files imager-vm:/mnt/tmp/*gz /cga/fh/pcawg_pipeline5/images
+
+#copy into bucket via gsutil cp
+gsutil mb gs://[BUCKET_NAME]
+gsutil cp /mnt/tmp/myimage.tar.gz gs://[BUCKET_NAME]
+
+#make images via
+gcloud compute images create [IMAGE_NAME] --source-uri [URI]
+
+gcloud compute images describe [IMAGE_NAME]

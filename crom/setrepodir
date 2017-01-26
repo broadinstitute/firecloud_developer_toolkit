@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+#
+# Source (don't run) this script to update the path in the current shell
+
+
+if [ "$0" != "bash" -a "$0" != "-bash" ]; then
+    echo "usage: . setrepodir [<repodir>]"
+else
+
+    if [ -z "$1" ]; then
+        reporoot=`pwd`
+    else
+        reporoot="$1"
+    fi
+
+    if [ $(ls -1 $reporoot | egrep -c "Makefile.inc|tasks|workflows") != "3" ]; then
+        echo "$reporoot does not look like a valid repo, it must be set up using fdtsetroot"
+    else
+        unset FDT_CURRENT_ALG_ROOT
+        export FDT_REPO_ROOT=$reporoot
+        echo "current algdir now <blank>"
+        echo "current repo now $FDT_REPO_ROOT"
+    fi
+
+    unset reporoot
+
+fi

@@ -1,0 +1,34 @@
+#!/bin/bash
+
+if [ "$0" != "bash" -a "$0" != "-bash" ]; then
+    echo "this must be run via sourcing it from bash, eg '. createnewrepo [newreponame]'"
+else
+
+
+    if [ -z "$FDT_ROOT" ] ; then
+        echo "FDT_ROOT must be set, please source fdtsetroot"
+    else
+        if [ -z "$1" ]; then
+            export FDT_REPO_ROOT=`pwd`
+        else
+            # TODO complain if directory passed in is not an absolute path
+            export FDT_REPO_ROOT="$1"
+        fi
+        unset FDT_CURRENT_ALG_ROOT
+
+
+        mkdir -p $FDT_REPO_ROOT/tasks
+        mkdir  $FDT_REPO_ROOT/workflows
+        cp -r $FDT_ROOT/algutil $FDT_REPO_ROOT
+        cp $FDT_ROOT/crom/private/gitignore.repodir $FDT_REPO_ROOT/.gitignore
+        cp $FDT_ROOT/crom/private/Makefile.inc.repodir $FDT_REPO_ROOT/Makefile.inc
+        cp $FDT_ROOT/crom/private/Makefile.repodir $FDT_REPO_ROOT/Makefile
+        cp $FDT_ROOT/crom/private/Makefile.taskdir $FDT_REPO_ROOT/tasks/Makefile
+        cp $FDT_ROOT/crom/private/Makefile.workflowdir $FDT_REPO_ROOT/workflows/Makefile
+
+        echo "current algdir now <empty>"
+        echo "current repo now $FDT_REPO_ROOT"
+
+        cd $FDT_REPO_ROOT
+    fi
+fi

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# TODO add commandline args to specify taskdef and inputtest files
+
+if [ -z "$FDT_CURRENT_ALG_ROOT" ] ; then
+    echo "FDT_CURRENT_ALG_ROOT must be set, please source setalgdir"
+else
+
+    cd $FDT_CURRENT_ALG_ROOT
+
+    make createinputtest
+
+    cd - #return to previous cwd
+fi

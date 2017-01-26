@@ -1,0 +1,70 @@
+
+there should probably be scripted commands for doing rsync, eg
+rsync_to_vm <vmname> <localfile or dir 1> <localfile2...> <destination-dir or file>
+rsync_from_vm <vmname> <vm file or dir 1> <vm file2...> <local-dir or file> - give warning about egress charge
+probably omit -delete from rsync
+but rsync is lame for multi-GB files, something using gsutil cp via intermediary bucket would be more practical.
+---
+now have a rsync_to_vm
+next up: rsync_to_bucket, rsync_from_bucket (blocks non-gce instances), cp_from_vm (non recursive, with size check and warning)
+
+? add bucket ls, with a link to the console
+
+
+---
+https://cloud.google.com/sdk/gcloud/reference/compute/copy-files
+https://cloud.google.com/compute/docs/instances/transfer-files
+
+gcloud compute copy-files [LOCAL_FILE_PATH] [INSTANCE_NAME]:~/
+
+gcloud compute copy-files [INSTANCE_NAME]:[REMOTE_FILE_PATH] [LOCAL_FILE_PATH]
+
+#get ip address
+gcloud compute instances list
+list_vm.sh
+
+#bulk copy
+rsync -av -e "ssh -i $HOME/.ssh/google_compute_engine"  foo $USER@104.197.89.118:/opt
+
+rsync -av --exclude ".*" -e "ssh -i $HOME/.ssh/google_compute_engine"  /cga/fh/pcawg_pipeline5/pcawg $USER@104.197.21.16:/opt
+
+rsync -av --delete --exclude ".*" -e "ssh -i $HOME/.ssh/google_compute_engine"  /cga/fh/pcawg_pipeline5/pcawg $USER@104.197.21.16:/opt
+
+#via sftp.  Note that sftp can be set up to copy directories when pycharm does a save
+sftp  -o "IdentityFile=$HOME/.ssh/google_compute_engine"  gsaksena@23.236.50.165
+
+
+
+scp -i $HOME/.ssh/google_compute_engine [LOCAL_FILE_PATH] [USERNAME]@[IP_ADDRESS]:~
+
+
+https://cloud.google.com/storage/docs/gsutil/commands/cp
+
+
+gsutil -m  cp *.txt gs://my-bucket
+Similarly, you can download text files from a bucket by doing:
+
+gsutil -m  cp gs://my-bucket/*.txt .
+If you want to copy an entire directory tree you need to use the -r option:
+
+gsutil -m  cp -r dir gs://my-bucket
+
+
+
+rsync -av -e "ssh -i $HOME/.ssh/google_compute_engine   -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" --progress foo gsaksena@104.197.89.118:/opt
+
+rsync -av -e "ssh -i $HOME/.ssh/google_compute_engine   -o StrictHostKeyChecking=no "  foo gsaksena@104.197.89.118:/opt
+
+rsync -av -e "ssh -i $HOME/.ssh/google_compute_engine"  foo $USER@104.197.89.118:/opt
+
+
+rsync -avz -e "ssh -p1234  -i \"$HOME/.ssh/1234-identity\"" dir remoteUser@server:
+rsync -avz -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" --progress /root/bigfile.txt 198.211.117.129:/root/
+mkdir ~/.ssh
+chmod 0700 ~/.ssh
+touch ~/.ssh/authorized_keys
+chmod 0644 ~/.ssh/authorized_keys
+
+
+
+gsutil -m rsync -r /opt/test_data gs://fc-4cd7fc16-6aa3-469c-8d05-1c9da33447b0
