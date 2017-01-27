@@ -32,7 +32,7 @@ The first step is to clone this repo to someplace on your local laptop or Linux 
 fdtsetroot sets environment variables, and adds its directories to your path.  Use the -s option to also modify your .bashrc.
 ```
 cd /opt
-git clone https://github.com/broadinstitute/firecloud_developers_workbench.git /opt/fdt
+git clone https://github.com/broadinstitute/firecloud_developer_toolkit.git /opt/fdt
 cd /opt/fdt
 . fdtsetroot -s
 ```
