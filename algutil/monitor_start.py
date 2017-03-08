@@ -76,7 +76,7 @@ num_disks = int(stdout_str16)
 disk_info = ''
 for d in range(num_disks):
     (err, stdout_str17, stderr_str) = execute_str(
-        'curl "http://metadata.google.internal/computeMetadata/v1/instance/disks/%d/type" -H "Metadata-Flavor: Google" | wc -l'%d)
+        'curl "http://metadata.google.internal/computeMetadata/v1/instance/disks/%d/type" -H "Metadata-Flavor: Google" '%d)
     info = 'disk %d: %s; '%(d,stdout_str17)
     disk_info += info
 emit (disk_info)
