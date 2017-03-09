@@ -45,7 +45,7 @@ class LocalEngine:
         if self._firehose_mode:
             value = 1
         else:
-            value = int(0.9*self._totmem) #90 percent of memory is used... allow some margin to avoid swapping
+            value = int(self._totmem) #100 percent of memory is used
         return value
 
 
