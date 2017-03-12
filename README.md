@@ -46,7 +46,7 @@ update_gsutil_latest_nr.sh    # run this instead if gsutil is already installed
 To work with Firecloud, you should install Firecloud-specific utilities.  Cromwell/wdltool is needed on your laptop to 
 validate and parse your wdl file.
 ```
-install_cromwell_21_nr.sh          # root not needed.  21 is the current FireCloud version as of Jan 2017.
+install_cromwell_24_nr.sh          # root not needed.  24 is the current FireCloud version as of March 2017.
 ```
 fissfc and firecloud cli are needed to use commandline tools to interact directly with Firecloud, eg for loading wdl files, 
 loading data loadfiles, or launching and monitoring workflows.
