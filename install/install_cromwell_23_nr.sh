@@ -14,4 +14,3 @@ mv cromwell.tmp.jar $FDT_BIN_ROOT/cromwell.jar
 curl -L https://github.com/broadinstitute/wdltool/releases/download/0.4/wdltool-0.4.jar > wdltool.tmp.jar
 mv wdltool.tmp.jar $FDT_BIN_ROOT/wdltool.jar
 
-unset install_root
