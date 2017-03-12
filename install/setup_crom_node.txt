@@ -1,0 +1,16 @@
+
+
+sudo apt-get install git
+
+cd /opt
+git clone https://github.com/broadinstitute/firecloud_developer_toolkit.git /opt/fdt
+cd /opt/fdt
+#edit path and user's .bashrc
+. fdtsetroot -s   
+
+cd 
+
+set_timezone_ET.sh
+install_gsutil_latest_nr.sh 
+install_stackdriver.sh
+
