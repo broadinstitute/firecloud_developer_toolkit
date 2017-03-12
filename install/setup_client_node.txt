@@ -1,4 +1,5 @@
 
+#for setting up a new local ubuntu installation, eg in a virtual box
 
 #assumes python 2.7 already installed as the default python
 
