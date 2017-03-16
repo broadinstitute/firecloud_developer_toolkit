@@ -5,11 +5,12 @@
 #example usage:
 #create_and_start_vm.sh myinstance1 n1-standard-2 20
 
-#todo change the boot disk to append -base
 
 instance_name=$1 #lower case or dashes
 mtype=$2  # eg n1-standard-2 (2 cores with 3.75GB/core)  or n1-highmem-8 (8 core with 7.5GB/core).  see https://cloud.google.com/compute/pricing for more options
 disk_size=$3 # holds the docker images, docker disks, and whatever you put on /opt.  In GB.  eg 20
+
+#TODO check that instance name is legal before proceeding
 
 # set these to disk images
 base_image=rebc-m2template

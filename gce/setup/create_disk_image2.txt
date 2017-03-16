@@ -2,9 +2,9 @@
 
 instancename=$1
 imagename=$2
-# todo - edit this script and the initial setup script to append "-disk" to the disk names. also the create script.
-# todo - error checking on imagename validity, 
-# todo checking that images created successfully before deleting sounce disks
+
+#TODO ask user to verify the project is correct
+#TODO check that the image name is legal
 
 gcloud compute instances stop $instancename
 
@@ -18,6 +18,8 @@ gcloud compute instances delete $instancename --keep-disks=all -q
 gcloud compute images create $imagename --source-disk $instancename
 gcloud compute images create ${imagename}-aux --source-disk ${instancename}-aux
 
+
+#TODO ask user to verify images were created successfully, then proceed to delete the base disks
 # the disks can be deleted once you are sure you are done imaging them.
 # gcloud compute disks delete $instancename $instancename
 # gcloud compute disks delete $instancename ${instancename}-aux
