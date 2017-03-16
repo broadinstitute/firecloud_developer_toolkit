@@ -11,9 +11,12 @@ mtype=$2  # eg n1-standard-2 (2 cores with 3.75GB/core)  or n1-highmem-8 (8 core
 disk_size=$3 # holds the docker images, docker disks, and whatever you put on /opt.  In GB.  eg 20
 
 #TODO check that instance name is legal before proceeding
+#TODO fix things so that errors don't cause junk resources to be left behind
+#TODO print the project that the vm is being created in, as a reminder
+
 
 # set these to disk images
-base_image=rebc-m2template
+base_image=pcawg-test-image
 image_project=broad-cga-gsaksena-rebc
 # default project can be looked up via 'gcloud compute project-info describe'
 aux_image=${base_image}-aux
