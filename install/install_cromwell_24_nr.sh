@@ -10,6 +10,7 @@ fi
 mkdir -p $FDT_BIN_ROOT
 cd /tmp
 curl -L https://github.com/broadinstitute/cromwell/releases/download/24/cromwell-24.jar > cromwell.tmp.jar
+
 mv cromwell.tmp.jar $FDT_BIN_ROOT/cromwell.jar
 curl -L https://github.com/broadinstitute/wdltool/releases/download/0.8/wdltool-0.8.jar > wdltool.tmp.jar
 mv wdltool.tmp.jar $FDT_BIN_ROOT/wdltool.jar
