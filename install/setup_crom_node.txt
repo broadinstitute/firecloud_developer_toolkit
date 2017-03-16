@@ -1,11 +1,13 @@
 
 
-# for setting things up from a bare debian 7bp GCE image.
+# for setting things up from a bare debian 7bp GCE image, ie 
+# --image backports-debian-7-wheezy-v20160531 --image-project debian-cloud
+# this is the one used by Firecloud as of March 2017.
 # Old, minimal version of Python 2.7 already installed, along with an old version of gsutil.
 # note that some of these commands modify ~/.bashrc, and so may need a tweak to work for other users.
-# in particular: fdtsetroot, firecloudcli, docker, gcloud init.
+# in particular: fdtsetroot, firecloudcli, docker, gcloud init, editing the .boto file.
 
-sudo apt-get install git
+sudo apt-get install -y git
 
 cd /opt
 git clone https://github.com/broadinstitute/firecloud_developer_toolkit.git /opt/fdt
@@ -16,11 +18,15 @@ cd /opt/fdt
 cd 
 
 sudo apt-get update
-sudo apt-get upgrade
+sudo apt-get upgrade -y
 
 set_timezone_ET.sh
-install_gsutil_latest_nr.sh 
 
+#base gsutil already installed in gce image, so just update it and add alpha component
+sudo update_gsutil_latest_nr.sh
+sudo gcloud components install alpha -q
+
+#stackdriver install has some failures? may need to move later?
 install_stackdriver.sh
 
 install_oraclejavajdk_8_debian7bp.sh
@@ -29,7 +35,7 @@ install_utils.sh
 install_docker_latest_debian7bp.sh #sets docker unix group membership, needs relogin before it takes effect
 
 
-install_cromwell_24_nr.sh 
+install_cromwell_25_nr.sh 
 install_firecloudcli_latest_nr.sh 
 install_fissfc_latest.sh  
 
@@ -48,6 +54,8 @@ gcloud init
 # Set application-default if using fissfc  
 gcloud auth application-default login 
 
+sudo gpasswd -a ${USER} docker  # add yourself to the docker unix group, needed for crom to work.  Requires relogin to take effect.
+<logout and back in again>
 docker login
 
 
@@ -63,6 +71,7 @@ docker login
 #parallel_composite_upload_component_size = 50M
 #sliced_object_download_threshold = 0
 #sliced_object_download_component_size = 50M
+#sliced_object_download_max_components = 4 
 
 
 # ----
