@@ -1,6 +1,7 @@
 #!/bin/bash
 # Installs Stackdriver monitoring and logging drivers to node.
-# The parent project also needs to be set up for things to work. 
+# The parent project also needs to be set up for things to work.
+# access via something like: https://app.google.stackdriver.com/?project=broad-cga-gsaksena-rebc 
 
 cd /tmp
 
