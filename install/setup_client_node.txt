@@ -1,0 +1,38 @@
+
+#for setting up a new local ubuntu installation, eg in a virtual box
+
+#assumes python 2.7 already installed as the default python
+
+sudo apt-get update # do this shortly before running any apt-get installs (within hours)
+
+sudo apt-get install -y git
+
+# configure git if you want to commit stuff
+#  git config --global user.email "you@example.com"
+#  git config --global user.name "Your Name"
+
+
+mkdir ~/dev
+git clone https://github.com/broadinstitute/firecloud_developer_toolkit.git ~/dev/fdt
+cd ~/dev/fdt
+. fdtsetroot -s
+
+install_gsutil_latest_nr.sh 
+
+#optional - for authoring tools locally
+install_oraclejavajdk_8_ubuntu.sh # install java 1.8 if needed
+install_cromwell_24_nr.sh
+
+#optional - for pushing to Firecloud locally
+install_firecloudcli_latest_nr.sh 
+install_fissfc_latest.sh
+# install docker
+
+# restart shell before proceeding
+
+gcloud init
+# in gcloud init, set oath, set zone (east-b?).  
+# Also, a cert will be made on first usage of the credentials.
+# also set application-default if using fissfc  
+gcloud auth application-default login 
+

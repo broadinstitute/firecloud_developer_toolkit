@@ -7,6 +7,7 @@ disk_size="$3" # holds the docker images, docker disks, and whatever you put on 
 
 #create and start a new VM based on a system image
 # a second disk is created with the given disk_size, and mounted as /opt
+# warning - if your ssh key is not set up first, this will leave a partially set up vm behind
 
 disk_name=${instance_name}-aux
 
