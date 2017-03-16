@@ -12,10 +12,10 @@ mtype=$2  # eg n1-standard-2 (2 cores with 3.75GB/core)  or n1-highmem-8 (8 core
 disk_size=$3 # holds the docker images, docker disks, and whatever you put on /opt.  In GB.  eg 20
 
 # set these to disk images
-base_image=firecloud-deb7bp-2016-09-07
-aux_image=firecloud-deb7bp-2016-09-07-aux
-image_project=broad-gsaksena
+base_image=rebc-m2template
+image_project=broad-cga-gsaksena-rebc
 # default project can be looked up via 'gcloud compute project-info describe'
+aux_image=${base_image}-aux
 
 disk_name=${instance_name}-aux
 

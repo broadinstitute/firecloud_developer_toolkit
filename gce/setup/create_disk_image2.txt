@@ -2,7 +2,7 @@
 
 instancename=$1
 imagename=$2
-# todo - edit this script and the initial setup script to append "-disk" to the disk names.
+# todo - edit this script and the initial setup script to append "-disk" to the disk names. also the create script.
 # todo - error checking on imagename validity, 
 # todo checking that images created successfully before deleting sounce disks
 
