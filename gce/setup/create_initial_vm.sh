@@ -4,6 +4,7 @@ instance_name="$1" #lower case or dashes
 mtype="$2"  # eg n1-standard-2 (2 cores with 3.75GB/core)  or n1-highmem-8 (8 core with 6.5GB/core).  see https://cloud.google.com/compute/pricing for more options
 disk_size="$3" # holds the docker images, docker disks, and whatever you put on /opt.  In GB.  eg 20
 
+# if you are planning to create an image off this, you probably want a very small disk size, to give flexibility with the future size of the disk.
 
 #create and start a new VM based on a system image
 # a second disk is created with the given disk_size, and mounted as /opt

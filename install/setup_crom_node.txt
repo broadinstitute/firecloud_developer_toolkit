@@ -23,7 +23,7 @@ sudo apt-get upgrade -y
 set_timezone_ET.sh
 
 #base gsutil already installed in gce image, so just update it and add alpha component
-sudo update_gsutil_latest_nr.sh
+sudo gcloud components update -q
 sudo gcloud components install alpha -q
 
 #stackdriver install has some failures? may need to move later?
@@ -39,9 +39,10 @@ install_cromwell_25_nr.sh
 install_firecloudcli_latest_nr.sh 
 install_fissfc_latest.sh  
 
+install_emacs_latest.sh  # be sure to install your favorite editor, nano is already installed.
 
 #######
-# below this point, you probably do not want to run stuff for a disk that will be imaged
+# below this point, you probably do not want to run stuff for a disk that will be on a shared image
 #######
 
 # stores authorization tokens to home directory in ~/.boto. Don't leave this on an image!
