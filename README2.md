@@ -18,8 +18,14 @@ The currently supported approach for debugging docker containers for Firecloud i
 
 ## How do I use the crom framework to develop a Firecloud task?
 
-This framework assumes 1) you have sudo privileges that do not require a password re-prompt, 2) you are in the docker group,  3) you will be using the /opt directory for your development work, and 4) you are using a Linux rather than a BSD/Mac system.  These assumptions are consistent with the Google VM setup above.
+FireCloud algorithms are encapsulated in Docker containers and run by the Cromwell execution engine.  The 'crom' framework
+wraps common Docker and Cromwell commands needed to test your algorithm outside of Firecloud.  It assumes your tasks follow a certain directory structure and file naming convention, as set up by the createnewrepo and createnewtask scripts.  Once you have your task set up, including your source code, dockerfile, WDL, and input arguments, you can build the docker and run it within Cromwell.  You can monitor the code as it runs within Cromwell by examining the output files or attaching a bash shell to the running Docker container. After Cromwell finishes, you can "wake the container back up" by spinning up bash prompt in a new container, with the input and output files from the previous run already mounted.
 
+This framework currently assumes 1) you have sudo privileges that do not require a password re-prompt, 2) you are in the docker group,  3) you will be using the /opt directory for your development work, and 4) you are using a Linux rather than a BSD/Mac system.  These assumptions are consistent with the Google VM setup described above.
+
+#### preliminary
+
+You should make sure your utilities are up to date, to avoid discovering odd bugs that noone cares about.  Critical utilities include Cromwell, fissfc, and gsutil, in addition to firecloud_developer_toolkit.  Check the /opt/fdt/install directory for scripts to update them.  
 
 #### Create repo
 
