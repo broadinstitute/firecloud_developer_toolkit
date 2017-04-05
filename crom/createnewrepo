@@ -9,10 +9,10 @@ else
         echo "FDT_ROOT must be set, please source fdtsetroot"
     else
         if [ -z "$1" ]; then
-            export FDT_REPO_ROOT=`pwd`
+            export FDT_REPO_ROOT="$(pwd)"
         else
-            # TODO complain if directory passed in is not an absolute path
-            export FDT_REPO_ROOT="$1"
+            # Note- readlink does not exist on BSD/MacOS, and so will fail there.  Drop the path argument to use the cwd instead.  
+            export FDT_REPO_ROOT="$(readlink -f "$1")"
         fi
         unset FDT_CURRENT_ALG_ROOT
 

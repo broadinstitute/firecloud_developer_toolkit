@@ -177,8 +177,10 @@ stage_build: sourcefiles.${FOLDER}.list dockerfile_check  task_check
 
 	@touch $(CP_LOG)
 
-	@# if destinations are directories, they should end with / for more consistency during the copy
-	@# note filenames and directories should not include spaces
+	@# If destinations are directories, they should end with / for more consistency during the copy.
+	@# Note filenames and directories should not include spaces.
+	@# Note this fails on Macs, as its cp command does not support -l. That option could be removed 
+	@#   to choose a (slow, bulky) deep copy.
 	@echo "Localizing files in sourcefiles.method.list to ./build via hard link"; \
 	IFS=$$'\t'; \
 	tail -n +2 $(SOURCEFILES) | while read SRC DEST; do \

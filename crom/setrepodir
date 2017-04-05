@@ -7,14 +7,16 @@ if [ "$0" != "bash" -a "$0" != "-bash" ]; then
     echo "usage: . setrepodir [<repodir>]"
 else
 
+
     if [ -z "$1" ]; then
-        reporoot=`pwd`
+        reporoot="$(pwd)"
     else
-        reporoot="$1"
+        # Note- readlink does not exist on BSD/MacOS, and so will fail there.  Drop the path argument to use the cwd instead.  
+        reporoot="$(readlink -f "$1")"
     fi
 
     if [ $(ls -1 $reporoot | egrep -c "Makefile.inc|tasks|workflows") != "3" ]; then
-        echo "$reporoot does not look like a valid repo, it must be set up using fdtsetroot"
+        echo "$reporoot does not look like a valid task repo, it must be set up using createnewrepo"
     else
         unset FDT_CURRENT_ALG_ROOT
         export FDT_REPO_ROOT=$reporoot

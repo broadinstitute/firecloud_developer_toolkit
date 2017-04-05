@@ -10,7 +10,8 @@ else
     if [ -z "$1" ]; then
         algroot="$(pwd)"
     else
-        algroot="$1"
+        # Note- readlink does not exist on BSD/MacOS, and so will fail there.  Drop the path argument to use the cwd instead.  
+        algroot="$(readlink -f "$1")"
     fi
 
     parentsubdir=$(basename $(dirname $algroot))
