@@ -68,6 +68,15 @@ Tasks require certain files to be present that follow a certain naming conventio
 ```
 
 If the taskname is 'testtask', this creates the following files:
+* src/hello.py
+* sourcefiles.testtask.list 
+* docker.testtask.txt
+* taskdef.testtask.wdl
+* inputtest.testtask.json 
+* Makefile 
+* README.testtask.md 
+
+Here are the actual contents of each of these files, along with some notes about them:
 
 src/hello.py
 * Accepts a string and a file input.
@@ -240,6 +249,8 @@ If you have a script that runs elsewhere and you would like to dockerize it, fol
 * Update the WDL: taskdef.testtask.wdl.
     Test the WDL syntax via `validatewdl`.  Blank output means OK.
 
+    The tools only work with a single WDL file within the task/<taskname> directory, with the standard name.  If you want to have multiple WDL files that all use the same docker image, see the Workflows section (below).
+
     Inputs
     * Modify the inputs to match your task
     * Note that all input files will be in separate directories.  Add code here to symlink indexs to live in the same directory as the file they index, eg for BAMs and VCFs.
@@ -256,11 +267,11 @@ If you have a script that runs elsewhere and you would like to dockerize it, fol
     * All outputs should be written to the CWD or one of its subdirectories.  Any files written elsewhere will bloat the boot disk (see discussion under reference files, above).
     
     Update the Docker repo information
-        * These edits are not as important when running locally, before pushing to Dockerhub.
-        * Dockerhub = docker.io, Google container registry = us.gcr.io. 
-            *Google's seems more reliable than Dockerhub's, but someone had trouble making private containers work due to FC service account issues, and the pricing is a bit different.
-        * update the repo name testtask, if you want.  This repo needs to have already been created.
-        * update the version number, if you want. (Note that there is active work related to setting this version number.)
+    * These edits are not as important when running locally, before pushing to Dockerhub.
+    * Dockerhub = docker.io, Google container registry = us.gcr.io. 
+        *Google's seems more reliable than Dockerhub's, but someone had trouble making private containers work due to FC service account issues, and the pricing is a bit different.
+    * update the repo name testtask, if you want.  This repo needs to have already been created.
+    * update the version number, if you want. (Note that there is active work related to setting this version number.)
     
     Update the VM specs
     * Irrelevant for running on local Cromwell
@@ -286,12 +297,28 @@ If you have a script that runs elsewhere and you would like to dockerize it, fol
     * This info will be visible within GitHub as well as Firecloud.  It is for documentation only.
 
 ###### Workflow
+The 'workflows' directories contain one WDL file each, just like the 'tasks' directories, but they lack the files related to building a docker.  
+
+Files in a workflow directory:
+* taskdef.testtask.wdl
+* inputtest.testtask.json 
+* Makefile 
+* README.testtask.md 
+* (not yet named) file that points to composing tasks
+
+For multi-step workflows, the WDL is likely composed of multiple task blocks, each copied from the single-task-workflow WDL from the <repo>/tasks directories.  This is followed by a multiple-line workflow section of the WDL defining the DAG and intermediates.  (At some point there will be code to help update the task section of the WDL from the WDLs in the task directory.)
+
+For single-step workflows that need more than one wdl, the WDL looks similar to what is found in the repo/<tasks> directories, but contains some change from what is there.  Make sure that your docker repo name and tag are in sync between the tasks and workflows, even if you are not pushing images to the external repo.
+
+As before, you can have multiple inputtest files, just add characters to the middle of the name to give them distinct names.
+
+
 
 ###### Best practices
 
 Workflows
-* WDL workflows vs atomic tasks
-* WDL-based scatter gather vs Pipette-based scatter-gather.
+* WDL workflows vs atomic tasks tradeoffs
+* WDL-based scatter gather vs Pipette-based scatter-gather tradeoffs
 
 WDL
 * use of strings vs floats or ints
@@ -306,7 +333,7 @@ WDL
 * preemptible flag
 
 Dockerfiles
-<link to official best practices>
+* (link to official best practices)
 * apt-get install should be on same line as apt-get update, to avoid cryptic build failures in the future.
 * do not include CMD or EXEC lines, they make debug awkward
 
@@ -326,7 +353,8 @@ else
 <existing linux code>
 fi
 
+* print the algdir being used each time
 
-
+* something to create a new workflow
 
 
