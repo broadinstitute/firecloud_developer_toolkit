@@ -23,11 +23,11 @@ wraps common Docker and Cromwell commands needed to test your algorithm outside 
 
 While you are developing, you will have two different git repos on your development node: 1) FDT (this repo) for utilities, and 2) a task repo to hold your algorithms.  While many of the utilites are embedded in Makefiles that live in the task repo, they are intended to be called via wrappers that live in FDT, and certain functionality like creating a new task and running Cromwell depends on utilities that live in FDT.
 
-The utilities rely on several environment variables being set correctly.  These variables are set for you by the scripts, and all start with 'FDT_'.  `cd <fdt_root> && . fdtsetroot -s` as previously mentioned, both adds a pointer to the FDT repo to your current environment variables, as well as modifies .bashrc so that future shells will already be set up.  `. createnewrepo <path_to_new_task_repo>` and `. setrepodir [<path_to_existing_task_repo>]` creates a pointer to the task repo but leaves the algdir blank.  `. createnewtask <taskname>` and `. setalgdir [<fpath_to_task_dir>]` set the algdir, which is your current working task.  This current working task is the implicit target of most of the crom tools, such as build and runcromwell. The pointers to the task repo and current task are _not_ stored in .bashrc, so you will need to run the `setalgdir` command each time you power up the VM or create a new shell.
+The utilities rely on several environment variables being set correctly.  These variables are set for you by the scripts, and all start with 'FDT_'.  `cd <fdt_root> && . fdtsetroot -s` as previously mentioned, both adds a pointer to the FDT repo to your current environment variables, as well as modifies .bashrc so that future shells will already be set up.  `. createnewrepo <path_to_new_task_repo>` and `. setrepodir [<path_to_existing_task_repo>]` creates a pointer to the task repo but leaves the algdir blank.  `. createnewtask taskname` and `. setalgdir [<fpath_to_task_dir>]` set the algdir, which is your current working task.  This current working task is the implicit target of most of the crom tools, such as build and runcromwell. The pointers to the task repo and current task are _not_ stored in .bashrc, so you will need to run the `setalgdir` command each time you power up the VM or create a new shell.
 
 This framework currently assumes 1) you have sudo privileges that do not require a password re-prompt, 2) you are in the docker group,  3) you will be using the /opt directory for your development work, and 4) you are using a Linux rather than a BSD/Mac system.  These assumptions are consistent with the Google VM setup described above.
 
-#### preliminary
+### Preliminary
 
 You should make sure key utilities are up to date, to avoid encountering odd bugs that noone cares about.   
 ```
@@ -38,7 +38,7 @@ install_fissfc_latest.sh
 install_firecloudcli_latest_nr.sh
 ```
 
-#### Create repo
+### Create repo
 To start with, create a new task repo:
 ```
 . createnewrepo <path_to_new_task_repo>
@@ -59,26 +59,26 @@ This command does _not_ create an actual git repo or attach it to GitHub.  If yo
 * `. createnewrepo /full/path/to/mynewrepo`
 You can also initialize and attach your repo to GitHub later, but the steps are different.
 
-#### Create task
+#### Create task template
 
 Tasks require certain files to be present that follow a certain naming convention.  To make this easier, the `createnewtask` script generates a hello-world task that follows these conventions, giving you a starting point.
 
 ```
-. createnewtask <taskname>
+. createnewtask taskname
 ```
 
-If the taskname is 'testtask', this creates the following files:
+If the taskname is 'taskname', this creates the following files:
 * src/hello.py
-* sourcefiles.testtask.list 
-* docker.testtask.txt
-* taskdef.testtask.wdl
-* inputtest.testtask.json 
+* sourcefiles.taskname.list 
+* docker.taskname.txt
+* taskdef.taskname.wdl
+* inputtest.taskname.json 
 * Makefile 
-* README.testtask.md 
+* README.taskname.md 
 
 Here are the actual contents of each of these files, along with some notes about them:
 
-src/hello.py
+**src/hello.py**
 * Accepts a string and a file input.
 * Emits a file result.
 ```
@@ -98,9 +98,9 @@ outfid.write('%s %s\n'%(salutation,name))
 outfid.close()
 ```
 
-sourcefiles.testtask.list 
-* TSV table to tell the build process to pull files from elsewhere in the repository to the tasks/testtask/build directory.
-* The docker.testtask.txt file will also be copied to the build directory, but does not need to be listed here.
+**sourcefiles.taskname.list** 
+* TSV table to tell the build process to pull files from elsewhere in the repository to the tasks/taskname/build directory.
+* The docker.taskname.txt file will also be copied to the build directory, but does not need to be listed here.
 ```
 src    dest
 src/*  build/src/
@@ -108,27 +108,27 @@ src/*  build/src/
 ```
 
 
-docker.testtask.txt
+**docker.taskname.txt**
 * Starts from a recent stable Ubuntu image.
 * Installs Python and the dstat monitoring tool, useful for tuning the VM size.  
 * Installs sudo so you can paste in other installation commands with less editing.  
-* Copies tasks/testtask/build/src directory to live under /opt/src in the docker.
+* Copies tasks/taskname/build/src directory to live under /opt/src in the docker.
 ```
 FROM ubuntu:16.04
 RUN apt-get update && apt-get install -y python sudo dstat
 
-#copy contents of tasks/<taskname>/build/src on the build host into /opt/src on the docker
+#copy contents of tasks/taskname/build/src on the build host into /opt/src on the docker
 COPY src/ /opt/src/
 
 WORKDIR /opt/src
 ```
 
-taskdef.testtask.wdl
+**taskdef.taskname.wdl**
 * Single task workflow WDL
 * Accepts file and string inputs, generates file outputs.
 * Accepts an input for the output disk size, explicitly hard-codes other VM parameters.
 * A non-preemptible VM is chosen.
-* The docker repo name, location, and version used when pushing it is specified in the runtime block:  "docker.io/<user>/testtask:1" = Dockerhub, <user> repo name, and 1 = version tag.
+* The docker repo name, location, and version used when pushing it is specified in the runtime block:  "docker.io/<user>/taskname:1" = Dockerhub, <user> repo name, and 1 = version tag.
 
 * Glue code is all in Python, for better readability and exception handling than bash (at least when things are more complicated/realistic than this example)
 * Note that double quotes are avoided or escaped in the Python code, so they don't terminate the python_cmd variable definition. Braces used for Python dictionaries also need escaping, otherwise they are interpreted as WDL variable substitution.
@@ -136,7 +136,7 @@ taskdef.testtask.wdl
 * monitor_start.py and monitor_stop.py drop several log files that can be useful for debugging crashes or sizing the VM.
 
 ```
-task testtask {
+task taskname {
 
     #Inputs and constants defined here
     String salutation_input_string
@@ -179,7 +179,7 @@ run('/opt/src/algutil/monitor_stop.py')
     }
 
     runtime {
-        docker : "docker.io/<user>/testtask:1"
+        docker : "docker.io/<user>/taskname:1"
         memory: "${ram_gb}GB"
         cpu: "${cpu_cores}"
         disks: "local-disk ${output_disk_gb} HDD"
@@ -195,24 +195,24 @@ run('/opt/src/algutil/monitor_stop.py')
 
 }
 
-workflow testtask_workflow {
-    call testtask
+workflow taskname_workflow {
+    call taskname
 }
 ```
 
 
-inputtest.testtask.json 
+**inputtest.taskname.json** 
 * input arguments for running Cromwell on the local node
 * file args can be absolute paths, http links, or gs:// links.
 ```
 {
-    "testtask_workflow.testtask.salutation_input_string": "hello",
-    "testtask_workflow.testtask.name_input_file": "https://personal.broadinstitute.org/gsaksena/world.txt",
-    "testtask_workflow.testtask.output_disk_gb": "10"
+    "taskname_workflow.taskname.salutation_input_string": "hello",
+    "taskname_workflow.taskname.name_input_file": "https://personal.broadinstitute.org/gsaksena/world.txt",
+    "taskname_workflow.taskname.output_disk_gb": "10"
 }
 ```
 
-Makefile 
+**Makefile** 
 * Contains values used when pushing the WDL to Firecloud
 * namespace = username on this node, method name = directory name under tasks.
 ```
@@ -221,69 +221,70 @@ FIRECLOUD_WDL_DOMAIN=${USER}
 FIRECLOUD_WDL_METHOD_NAME=${FOLDER}
 ```
 
-README.testtask.md 
+**README.taskname.md** 
 * Minimalist readme file for your task.
 ```
-# README for testtask
+# README for taskname
 ```
 
-###### Simple task
-If you have a script that runs elsewhere and you would like to dockerize it, follow these steps:
+### Edit template to add a single task
+When you have a script that runs elsewhere and you would like to dockerize it, follow these steps:
 
-* run `. createnewtask <taskname>` as described above.
-* Import your source code
-    * Either ignore or get rid of src/hello.py
-    * If you have an independent script or set of scripts, copy them all into the <taskname>/src directory.
-    * If you have common code that you want to pull into multiple docker images
-        * put just the code that is specific to this task under the <taskname>/src directory.
+* run `. createnewtask taskname` as described above, to create a hello-world template
+* Import your source code to taskname/src/
+    * Either ignore or get rid of taskname/src/hello.py
+    * If you have an independent script or set of scripts, copy them all into the taskname/src directory.
+    * If you have common code that you want to share among multiple docker images
+        * put just the code that is specific to this task under the taskname/src directory.
         * create a directory outside of this task, eg <reponame>/common, and copy the common code there.
-* Update the sourcefiles.<taskname>.list file
-    * If you have an independent script, ie all of your code lives under <taskname>/src, then you can leave this file alone.
+        
+* Update the sourcefiles.taskname.list file
+    * If you have an independent script, ie all of your code lives under taskname/src, then you can leave this file alone.
     * If you want to pull in files from elsewhere in the repo into the build, add source-destination pairs to this file.  Everything under a source directory will be recursively copied.  If the destination is a directory, be sure to terminate it with a slash.
 
-* Update the docker file: docker.testtask.txt
+* Update the docker file: docker.taskname.txt
     * Add whatever other languages or packages you need.
     * Refer to the ```install``` directory under FDT for common installation recipes.
     * Refer to dockerfile best practices to avoid common pitfalls.
 
-* Update the WDL: taskdef.testtask.wdl.
+* Update the WDL: taskdef.taskname.wdl.
     Test the WDL syntax via `validatewdl`.  Blank output means OK.
 
-    The tools only work with a single WDL file within the task/<taskname> directory, with the standard name.  If you want to have multiple WDL files that all use the same docker image, see the Workflows section (below).
+    The tools only work with a single WDL file within the task/taskname directory, with the standard name.  If you want to have multiple WDL files that all use the same docker image, see the Workflows section (below).
 
-    Inputs
+    **Inputs**
     * Modify the inputs to match your task
     * Note that all input files will be in separate directories.  Add code here to symlink indexs to live in the same directory as the file they index, eg for BAMs and VCFs.
     * Untar reference file bundles if needed.  
         * You probably want to put them into a subdirectory of the output directory - putting them anywhere else, eg /tmp, will bloat the boot disk and cause mysterious VM lockups if it fills. An issue has been filed to request Firecloud stores the whole docker image, not just the execution and inputs directories, on the output disk.
     * For aggregation parameters (eg when running on a sample_set with a sample-level annotation), parse the representation passed in from Firecloud.
 
-    Outputs
+    **Outputs**
     * Ok to leave outputs blank initially - run things locally first, then see the exact outputs to fill in.
 
-    Command
+    **Command**
     * Update the commandline to run your algorithm
     * Be extremely careful that a failure anywhere in your command, or in the input/output processing, causes a non-zero exit code to be returned from the comamnd block.  You can do this by using Python for the whole command block or by setting bash flags such as `set -euo pipefail`.
     * All outputs should be written to the CWD or one of its subdirectories.  Any files written elsewhere will bloat the boot disk (see discussion under reference files, above).
     
-    Update the Docker repo information
+    **Update the Docker repo information**
     * These edits are not as important when running locally, before pushing to Dockerhub.
     * Dockerhub = docker.io, Google container registry = us.gcr.io. 
         *Google's seems more reliable than Dockerhub's, but someone had trouble making private containers work due to FC service account issues, and the pricing is a bit different.
-    * update the repo name testtask, if you want.  This repo needs to have already been created.
+    * update the repo name taskname, if you want.  This repo needs to have already been created.
     * update the version number, if you want. (Note that there is active work related to setting this version number.)
     
-    Update the VM specs
+    **Update the VM specs**
     * Irrelevant for running on local Cromwell
     * On Firecloud, memory and cpu requests rounded up to nearest pre-defined VM type (see https://cloud.google.com/compute/pricing)
     * The boot disk can stay at 10GB, unless your algorithm must write to someplace outside the output directory.
     * The output disk must be sized to hold all input files, intermediate files, and output files.
     * See best-practices for how to set the preemptible flag
 
-    Update meta tags
+    **Update meta tags**
     * Fill in contact info of the maintainer
 
-* Update the test inputs: inputtest.testtask.json
+* Update the test inputs: inputtest.taskname.json
     * This file is only used locally, not on Firecloud.
     * After significant WDL changes, you may want to use `createinputtest` to create a inputtest.tesktask.json.template file, to get all of the naming correct.
     * Files are passed in as JSON strings.  Currently they must start with /, http, or gs://. 'tests/' will also likely be supported soon, to allow test data to be referenced via a relative path.
@@ -293,20 +294,20 @@ If you have a script that runs elsewhere and you would like to dockerize it, fol
     * edit to update the namespace and method name to push the WDL to in Firecloud
     * These edits are not needed when running locally.
 
-* Update the Readme
+* Update the Readme: README.taskname.md
     * This info will be visible within GitHub as well as Firecloud.  It is for documentation only.
 
-###### Workflow
+### Multi-step workflows or alterative single-task workflows
 The 'workflows' directories contain one WDL file each, just like the 'tasks' directories, but they lack the files related to building a docker.  
 
 Files in a workflow directory:
-* taskdef.testtask.wdl
-* inputtest.testtask.json 
+* taskdef.taskname.wdl
+* inputtest.taskname.json 
 * Makefile 
-* README.testtask.md 
+* README.taskname.md 
 * (not yet named) file that points to composing tasks
 
-For multi-step workflows, the WDL is likely composed of multiple task blocks, each copied from the single-task-workflow WDL from the <repo>/tasks directories.  This is followed by a multiple-line workflow section of the WDL defining the DAG and intermediates.  (At some point there will be code to help update the task section of the WDL from the WDLs in the task directory.)
+For multi-step workflows, the WDL is composed of multiple task blocks, each copied from the single-task-workflow WDL from the <repo>/tasks directories.  This is followed by a multiple-line workflow section of the WDL defining the DAG and intermediates.  (At some point there will be code to help update the task section of the WDL from the WDLs in the task directory.)
 
 For single-step workflows that need more than one wdl, the WDL looks similar to what is found in the repo/<tasks> directories, but contains some change from what is there.  Make sure that your docker repo name and tag are in sync between the tasks and workflows, even if you are not pushing images to the external repo.
 
@@ -314,7 +315,7 @@ As before, you can have multiple inputtest files, just add characters to the mid
 
 
 
-###### Best practices
+### Best practices for designing tasks and workflows
 
 Workflows
 * WDL workflows vs atomic tasks tradeoffs
@@ -331,16 +332,18 @@ WDL
 * returning error codes reliably
 * dynamically sizing output disk
 * preemptible flag
+* monitor
 
 Dockerfiles
 * (link to official best practices)
 * apt-get install should be on same line as apt-get update, to avoid cryptic build failures in the future.
 * do not include CMD or EXEC lines, they make debug awkward
 
-#### Run task
+### Run task
+(info on the steps to run cromwell)
 
-
-#### Debug task
+### Debug task
+(info on resources available when debugging)
 
 --
 todo#
