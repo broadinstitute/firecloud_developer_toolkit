@@ -6,7 +6,7 @@
 
 instance_name="$1"
 
-if [ -z "$instance_name"]; then 
+if [ -z "$instance_name" ]; then 
     sudo shutdown -h now
 else
     gcloud compute instances stop $instance_name
