@@ -5,7 +5,7 @@
 
 sudo apt-get update # do this shortly before running any apt-get installs (within hours)
 
-sudo apt-get install -y git
+sudo apt-get install -y git curl
 
 # configure git if you want to commit stuff
 #  git config --global user.email "you@example.com"
@@ -26,6 +26,10 @@ install_cromwell_24_nr.sh
 #optional - for pushing to Firecloud locally
 install_firecloudcli_latest_nr.sh 
 install_fissfc_latest.sh
+
+sudo apt-get install -y docker.io
+sudo gpasswd -a ${USER} docker
+
 # install docker
 
 # restart shell before proceeding
