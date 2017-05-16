@@ -16,8 +16,8 @@ disk_size=$3 # holds the docker images, docker disks, and whatever you put on /o
 
 
 # set these to disk images
-base_image=pcawg-test-image
-image_project=broad-cga-gsaksena-rebc
+base_image=gsaksena-500-plain
+image_project=broad-cga-gsaksena-firecloud
 # default project can be looked up via 'gcloud compute project-info describe'
 aux_image=${base_image}-aux
 
