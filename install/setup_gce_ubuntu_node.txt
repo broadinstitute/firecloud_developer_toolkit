@@ -34,6 +34,10 @@ sudo gpasswd -a ${USER} docker
 install_openconnect.sh
 set_timezone_ET.sh
 
+#<user logins...>
+
+git config --global user.name $USER
+git config --global user.email "$USER@broadinstitute.org"
 
 
 # restart shell before proceeding
@@ -43,4 +47,9 @@ gcloud init
 # Also, a cert will be made on first usage of the credentials.
 # also set application-default if using fissfc  
 gcloud auth application-default login 
+
+#relogin before proceeding
+
+docker login
+
 
