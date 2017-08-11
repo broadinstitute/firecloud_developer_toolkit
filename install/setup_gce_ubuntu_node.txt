@@ -1,10 +1,10 @@
 
-#for setting up a new local ubuntu installation, eg in a virtual box
+#for setting up a new ubuntu 16.04 installation on a gce node
 
 
 sudo apt-get update # do this shortly before running any apt-get installs (within hours)
 
-sudo apt-get install -y git curl
+sudo apt-get install -y git curl tree
 
 # configure git if you want to commit stuff
 #  git config --global user.email "you@example.com"
