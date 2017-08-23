@@ -18,7 +18,7 @@ cd ~/dev/fdt
 
 install_python_2.7.sh
 
-install_gsutil_latest_nr.sh 
+install_gsutil_latest.sh 
 
 #optional - for authoring tools locally
 install_oraclejavajdk_8_ubuntu.sh # install java 1.8 if needed
