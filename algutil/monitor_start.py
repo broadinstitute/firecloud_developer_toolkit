@@ -99,9 +99,9 @@ dstat_process_mini = subprocess.Popen(dstat_list, stdout=DEVNULL, stderr=subproc
 
 # launch dstat full as a background process, routing the stdout to /dev/null
 
-dstat_cmd_str = "dstat --nocolor --noheaders -tcdngym --freespace --top-cpu-adv --top-io --top-mem --top-bio-adv --dstat-mem  --output %s"%dstat_full_log_filename
-dstat_list=dstat_cmd_str.split()
-dstat_process_full = subprocess.Popen(dstat_list, stdout=DEVNULL, stderr=subprocess.STDOUT)
+#dstat_cmd_str = "dstat --nocolor --noheaders -tcdngym --freespace --top-cpu-adv --top-io --top-mem --top-bio-adv --dstat-mem  --output %s"%dstat_full_log_filename
+#dstat_list=dstat_cmd_str.split()
+#dstat_process_full = subprocess.Popen(dstat_list, stdout=DEVNULL, stderr=subprocess.STDOUT)
 
 
 
