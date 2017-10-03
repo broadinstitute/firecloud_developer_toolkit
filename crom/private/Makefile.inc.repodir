@@ -275,7 +275,8 @@ clearoutputs:
 
 pushwdl: wdl_check fissfc_check
 	@#FIRECLOUD_WDL_DOMAIN and FIRECLOUD_WDL_METHOD_NAME are defined in the task specific Makefile.
-	fissfc -u $(FIRECLOUD_API_URL) flow_new  -d $(README) $(FIRECLOUD_WDL_DOMAIN) $(FIRECLOUD_WDL_METHOD_NAME) $(TASKDEF) $(FOLDER); \
+	@#fissfc -u $(FIRECLOUD_API_URL) flow_new  -d $(README) $(FIRECLOUD_WDL_DOMAIN) $(FIRECLOUD_WDL_METHOD_NAME) $(TASKDEF) $(FOLDER); \
+	fissfc -u $(FIRECLOUD_API_URL) meth_new  --doc $(README) -n $(FIRECLOUD_WDL_DOMAIN) -m $(FIRECLOUD_WDL_METHOD_NAME) -d $(TASKDEF) -s $(FOLDER); \
 
 
 sync: workflow_check wdl_check sync_check
