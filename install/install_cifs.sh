@@ -10,3 +10,12 @@ sudo apt-get install cifs-utils
 #
 # automated mount
 # edit fstab... see https://askubuntu.com/questions/334422/mounted-cifs-share-but-no-write-permissions
+# eg
+# edit /etc/fstab to add a line like:
+# //argon/cil_shed/  /cil/shed    cifs    credentials=/home/<usename>/.smbcredentials,iocharset=utf8,noperm       0       0
+# then do 'sudo mkdir -p /cil/shed'
+# then create a file at /home/<usename>/.smbcredentials that contains:
+# username=<username>
+# password=<passwd>
+# domain=<domain>
+# Finally, do 'sudo mount -a' to mount everything.
