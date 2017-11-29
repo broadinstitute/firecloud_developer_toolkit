@@ -43,7 +43,8 @@ gcloud init
 # in gcloud init, set oath, set zone (east-b?).  
 # Also, a cert will be made on first usage of the credentials.
 # also set application-default if using fissfc  
-gcloud auth application-default login 
+
+docker login
 
 #########
 #install iso
