@@ -41,7 +41,7 @@ for arg in inputs:
     #print (arg)
     #print (input_value)
 
-    is_file = input_value.startswith('/') or input_value.startswith('gs://') or input_value.startswith('http')
+    is_file = input_value.startswith('/') or input_value.startswith('gs://') or input_value.startswith('http') or input_value.startswith('test')
 
     if not is_file:
         outputs[arg] = input_value
