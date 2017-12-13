@@ -210,6 +210,9 @@ buildclean: stage_build version_check
 
 pushimage: task_check
 	docker push ${DOCKER_IMAGE_BASE}:${DOCKER_IMAGE_USERTAG}
+	# for GCR, need to do:
+	# gcloud docker -- push ${DOCKER_IMAGE_BASE}
+	
 
 pullimage: task_check
 	docker pull ${DOCKER_IMAGE_BASE}:${DOCKER_IMAGE_USERTAG}
@@ -244,7 +247,7 @@ runcromwell: validatewdl localizeinputs
 	# Running asynchronously with &.  Things will keep running if the ssh connection timeouts, but ctrl-c won't work.  Kill via:
 	# make kill_run
 	#
-	java -jar $(CROMWELLJAR) run $(TASKDEF) $(LOCALIZEDINPUTSDIR)/localized_inputs.$(FOLDER).json  $(TOOLS)/cromwell_test_config.json ${OUTPUTDIR}/run_metadata__${TIMESTAMP}.json &
+	java -jar $(CROMWELLJAR) run $(TASKDEF) -i $(LOCALIZEDINPUTSDIR)/localized_inputs.$(FOLDER).json  -o $(TOOLS)/cromwell_test_config.json -m ${OUTPUTDIR}/run_metadata__${TIMESTAMP}.json &
 	sleep 15
 	# link to the most recent run, which will be the one just started if it did not fail right away.
 	#TBD force it to link to the run just launched
