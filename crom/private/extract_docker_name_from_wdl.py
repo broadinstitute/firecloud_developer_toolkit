@@ -18,8 +18,10 @@ docker_line = None
 for line in fid:
     if 'docker' in line:
         if docker_line:
-            sys.exit(1)
+            #sys.exit(1)
             #raise Exception('multiple docker lines in wdl file')
+            sys.stderr.write("Warning: multiple docker lines in wdl file. Using first instance.\n")
+            break
         else:
             docker_line = line
 
@@ -45,3 +47,5 @@ else:
     #raise Exception('name_format must be usertag or base')
 
 print output
+#sys.stderr.write(output + '\n\n') #for debug, write result to stderr
+

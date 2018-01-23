@@ -41,7 +41,9 @@ for arg in inputs:
     #print (arg)
     #print (input_value)
 
-    is_file = input_value.startswith('/') or input_value.startswith('gs://') or input_value.startswith('http') or input_value.startswith('test')
+    # short circuits if input_value is not a string
+    is_file =  isinstance(input_value, basestring) and (
+        input_value.startswith('/') or input_value.startswith('gs://') or input_value.startswith('http') or input_value.startswith('test'))
 
     if not is_file:
         outputs[arg] = input_value
