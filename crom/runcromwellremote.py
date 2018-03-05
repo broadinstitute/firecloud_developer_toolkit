@@ -14,10 +14,15 @@ import subprocess
 
 
 global submission_id
+global running
+running = False
 base_url = 'http://35.193.85.62:8000'
 
 
 def killjob():
+    if not running:
+        # no work to do
+        return 
     # curl -X POST "http://35.193.85.62:8000/api/workflows/v1/ee447739-8953-4c76-b47c-bdc1d95df03f/abort" -H "accept: application/json"
     abort_url = base_url + '/api/workflows/v1/' + submission_id + '/abort'
     headers = {"accept":"application/json"}
@@ -25,36 +30,13 @@ def killjob():
     r = requests.post(abort_url, headers=headers, timeout=10 )
     print ("abort request sent")
 
-###### copy/pasted code to monitor abort 
-    # status_url = base_url + '/api/workflows/v1/' + submission_id + '/status'
-    # headers = {"accept":"application/json"}
-
-    # workflow_status = None
-
-    # from datetime import datetime 
-    # startTime= datetime.now()  
-
-    # while workflow_status not in ['Failed','Aborted']:
-    #     timeElapsed=datetime.now()-startTime 
-    #     #print('{}'.format(timeElapsed))
-
-    #     r = requests.get(status_url, headers = headers, timeout=10 )
-    # #{
-    # #  "status": "fail",
-    # #  "message": "Unrecognized workflow ID: 4824df01-ee6b-46c9-ab1d-bd9e3bd12f9d"
-    # #}
-
-    # #{'id': '4824df01-ee6b-46c9-ab1d-bd9e3bd12f9d', 'status': 'Failed'}
-
-    #     print(r.status_code, r.text, timeElapsed)
-    #     status_dict = json.loads(r.text)
-    #     workflow_status = status_dict['status']
-    #     time.sleep(1)
-
 atexit.register(killjob)
 
 
 def get_metadata():
+
+    # curl -X GET "http://35.193.85.62:8000/api/workflows/v1/05184cf6-432c-4901-bdf8-8768abee2862/metadata?expandSubWorkflows=false" -H "accept: application/json"
+
     metadata_url = base_url + '/api/workflows/v1/' + submission_id + '/metadata'
     data = {'expandSubWorkflows':'false'}
     headers = {"accept":"application/json"}
@@ -88,7 +70,9 @@ def get_metadata():
 
 def run_wdl(wdl_path, inputs_dict):
     global submission_id
+    global running
 
+    running = False
     submit_url = base_url + '/api/workflows/v1'
     headers = {"accept":"application/json"}
 
@@ -96,7 +80,7 @@ def run_wdl(wdl_path, inputs_dict):
     input_json = json.dumps(inputs_dict)
     files = { 'workflowSource': (os.path.basename(wdl_path),open(wdl_path,'rb'),""),
             'workflowInputs': ('input.json', input_json, "application/json")}
-
+    # TODO add option to disable caching for this submission, via  data fields: {"read_from_cache": false}
 
 
     r = requests.post(submit_url, headers=headers, files=files, timeout=10 )
@@ -116,19 +100,18 @@ def run_wdl(wdl_path, inputs_dict):
         raise exception('status is %s'%submission_response['status'])
 
     submission_id = submission_response['id']
+    running = True
 
     # curl -X GET "http://35.193.85.62:8000/api/workflows/v1/9bdc4d55-d551-4608-80b0-6a86e57bd2a0/status" -H "accept: application/json"
 
     status_url = base_url + '/api/workflows/v1/' + submission_id + '/status'
     headers = {"accept":"application/json"}
 
-    # Todo - dump output bucket path and URL after 5 minutes, or when completed.
-    workflow_status = None
-
     import datetime 
     startTime= datetime.datetime.now()  
 
-
+    workflow_status = None
+    workflow_urls = []
     while workflow_status not in ['Failed','Aborted','Succeeded']:
         timeElapsed=datetime.datetime.now()-startTime 
         #print('{}'.format(timeElapsed))
@@ -145,54 +128,24 @@ def run_wdl(wdl_path, inputs_dict):
         status_dict = json.loads(r.text)
         workflow_status = status_dict['status']
 
-        m = get_metadata()
-    
-        #print(json.dumps(m['struct'],indent=4))
-        workflow_urls = m.get('workflow_urls',[])
+        if len(workflow_urls) < 1:
+            # Fetch detailed metadata until directory first shows up, then stop updating it. May need to fix if more than one directory.
+            m = get_metadata()
+            #print(json.dumps(m['struct'],indent=4))
+            workflow_urls = m.get('workflow_urls',[])
         for workflow_url in workflow_urls:
             print(workflow_url)
         print('')
 
 
-        if timeElapsed < datetime.timedelta(seconds=30):
+        if timeElapsed < datetime.timedelta(seconds=10):
             sleep_time = 1
         else:
             sleep_time = 5
         time.sleep(sleep_time)
 
 
-
-    # curl -X GET "http://35.193.85.62:8000/api/workflows/v1/05184cf6-432c-4901-bdf8-8768abee2862/metadata?expandSubWorkflows=false" -H "accept: application/json"
-
-    # metadata_url = base_url + '/api/workflows/v1/' + submission_id + '/metadata'
-    # data = {'expandSubWorkflows':'false'}
-    # headers = {"accept":"application/json"}
-    # r = requests.get(metadata_url, headers=headers, data=data, timeout=10)
-    # print(r.status_code)
-    # metadata_json = json.loads(r.text)
-
-    # print(json.dumps(metadata_json, indent=4))
-    # outputs = metadata_json['outputs']
-    # inputs = metadata_json['submittedFiles']['inputs']
-    # inputs_dict = json.loads(inputs)
-    # outputs_dict = outputs
-    # print('')
-    # print('inputs:')
-    # for key in inputs_dict:
-    #     print (key)
-    #     print('     ', repr(inputs_dict[key]).replace("'",'"'))
-    #     print('')
-    # print('')
-    # print("outputs:")
-    # for key in outputs_dict:
-    #     print(key)
-    #     print('     ', repr(outputs_dict[key]).replace("'",'"'))
-    #     print('')
-    # if workflow_status == "Failed":
-    #     print('')
-    #     print('failures:')
-    #     print(json.dumps(metadata_json['failures'], indent=4))
-
+    running = False
     metadata = get_metadata()
     print (metadata['status_code'])
     print (json.dumps(metadata['struct'], indent=4))
@@ -220,17 +173,22 @@ def run_wdl(wdl_path, inputs_dict):
         failure_string2 = failure_string.replace(r'\\n','\n\n')
         print(failure_string2)
 
-    first_workflow_url = metadata['workflow_urls'][0]
-    first_workflow_dir = metadata['workflow_dirs'][0]
-    print ('listing of one output bucket:\n  %s\n  %s\n'%(first_workflow_url,first_workflow_dir))
-    subprocess.call('gsutil ls -l %s'%first_workflow_dir, shell=True)
+    try:
+        first_workflow_url = metadata['workflow_urls'][0]
+        first_workflow_dir = metadata['workflow_dirs'][0]
+        print ('listing of one output bucket:\n  %s\n  %s\n'%(first_workflow_url,first_workflow_dir))
+        subprocess.call('gsutil ls -l %s'%first_workflow_dir, shell=True)
+    except:
+        print('no bucket location found')
 
     print("")
     print("total time: %s"%timeElapsed)
+    print(workflow_status)
     print("")
 
+    passed = workflow_status == 'Succeeded'
 
-    return workflow_status, outputs
+    return passed, outputs
 
 if __name__ == "__main__":
 
@@ -250,4 +208,20 @@ if __name__ == "__main__":
     wdl_path = '/home/gsaksena/dev/btl_firecloud_gatk/workflows/btl_gatk_bqsr/taskdef.btl_gatk_bqsr.wdl'
 
 
-    status, outputs_dict = run_wdl(wdl_path, inputs_dict)
+    passed, outputs_dict = run_wdl(wdl_path, inputs_dict)
+
+
+
+# TODO enable call caching/job avoidance on server
+#     call-caching {
+
+#   enabled = true
+#   invalidate-bad-cache-results = true
+# }
+# filesystems {
+#   gcs{
+#     caching {
+#        duplication-strategy = "reference"
+#     }
+#   }
+# }
